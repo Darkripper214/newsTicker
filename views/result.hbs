@@ -1,0 +1,36 @@
+<div class="container">
+  {{#if articles}}
+  <div class="d-flex justify-content-between">
+    <h1>Here is your search result</h1>
+    <div class="d-flex align-items-center">
+      <a href="/" class="btn btn-warning">Return to Home</a>
+    </div>
+  </div>
+
+
+  <div class="container">
+    <div class="row justify-content-between">
+      {{#each articles}}
+      <div class="card col-4">
+        <div class="img-item" style="background: url('{{this.urlToImage}}')"></div>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{this.title}}</h5>
+          <p class="card-text small">{{this.description}}</p>
+          <p class="card-text small mt-auto">{{this.publishedAt}}</p>
+          <a href="{{this.url}}" class="btn btn-primary ">Read More</a>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{else}}
+  <div class="d-flex justify-content-between">
+    <h1>There are no Result</h1>
+  </div>
+  {{/if}}
+
+
+  <a href="/" class="btn btn-warning mt-2">Return to Home</a>
+  <p class="hidden">{{articles.1.searchTime}}</p>
+
+</div>

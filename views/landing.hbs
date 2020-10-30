@@ -1,0 +1,49 @@
+<div class="container d-flex justify-content-center">
+  <div class="">
+    <div class="">
+      <h1>Search for Latest Headline</h1>
+    </div>
+    <form action="/search" method="get">
+      <div class="form-group">
+        <input type="text" class="form-control" name="search" id="" placeholder="Search">
+      </div>
+
+      <div class="form-check">
+        <div class="row d-flex justify-content-around">
+          <input type="radio" name="country" id="" value="us">
+          <img src="/image/us.png" alt="">
+          <input type="radio" name="country" id="" value="uk">
+          <img src="/image/uk.png" alt="">
+          <input type="radio" name="country" id="" value="fr">
+          <img src="/image/fr.png" alt="">
+
+        </div>
+        <div class="row d-flex justify-content-around">
+          <input type="radio" name="country" id="" value="sg">
+          <img src="/image/sg.png" alt="">
+          <input type="radio" name="country" id="" value="jp">
+          <img src="/image/jp.png" alt="">
+          <input type="radio" name="country" id="" value="cn">
+          <img src="/image/cn.png" alt="">
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <select name="category" id="category" class="form-control">
+          <option value="business">Business</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="general">General</option>
+          <option value="health">Health</option>
+          <option value="science">Science</option>
+          <option value="sports">Sports</option>
+          <option value="technology">Technology</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block">Search</button>
+      </div>
+    </form>
+  </div>
+</div>
