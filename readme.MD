@@ -20,7 +20,7 @@ node index.js
 
 ## Sneak Peek
 
-![NewsTicker](static\gif\NewsTicker.gif)
+![NewsTicker](static/gif/NewsTicker.gif)
 
 ## License
 
