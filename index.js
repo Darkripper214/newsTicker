@@ -7,7 +7,7 @@ const cache = require('memory-cache');
 const port = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3838;
 
 let memCache = new cache.Cache();
-
+let cacheTime = new Date();
 // news api related variables
 const API_KEY = process.env.API_KEY;
 const pageSize = 9;
@@ -19,15 +19,32 @@ let cacheMiddleware = (duration) => {
     let cacheContent = memCache.get(key);
     if (cacheContent) {
       console.log('SENT CACHE!!!!');
+      res.status('304');
+      res.append('Last-Modified', cacheTime.toUTCString());
       res.send(cacheContent);
       return;
     } else {
-      res.sendResponse = res.send;
+      /*       res.sendResponse = res.send;
       res.send = (body) => {
+        console.log('DID NOT SENT CACHE!!!!');
         memCache.put(key, body, duration * 1000);
         res.sendResponse(body);
+      }; */
+
+      res.sendResponse = res.send;
+      addFunction = (func) => {
+        return function (body) {
+          console.log('DID NOT SENT CACHE!!!!');
+          memCache.put(key, body, duration * 1000);
+          console.log('CACHE SAVED');
+          // This Works!
+          // res.sendResponse(body);
+          // This does not work!
+          func(body);
+        };
       };
-      console.log('DID NOT SENT CACHE!!!!');
+      res.send = addFunction(res.sendResponse);
+      console.log('2_DID NOT SENT CACHE!!!!');
       next();
     }
   };
@@ -37,23 +54,35 @@ const app = express();
 app.engine('hbs', hbs({ defaultLayout: 'default.hbs' }));
 app.set('view engine', 'hbs');
 app.set('views', __dirname + '/views');
+app.set('etag', false);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('static'));
 
 app.get('/search', cacheMiddleware(60), async (req, res) => {
-  const response = await fetch(
-    withQuery(END_POINT, {
-      q: req.query.search,
-      apiKey: API_KEY,
-      pageSize: pageSize,
-      country: req.query.country,
-      category: req.query.category,
-    })
-  );
-  console.log(`Query made on ${new Date()}`);
+  let endpoint = withQuery(END_POINT, {
+    q: req.query.search,
+    /* apiKey: API_KEY, */
+    pageSize: pageSize,
+    country: req.query.country,
+    category: req.query.category,
+  });
+
+  const response = await fetch(endpoint, {
+    headers: { 'X-Api-Key': API_KEY },
+  });
+
+  let searchTime = new Date();
+  console.log(`Query made on ${searchTime}`);
 
   const jsonRes = await response.json();
   let articles = jsonRes.articles;
+
+  if (cacheTime - searchTime < -30000) {
+    console.log(cacheTime - searchTime);
+    cacheTime = searchTime;
+  }
+
+  console.log(cacheTime);
   // Replace null image with not availableimage
   articles = articles.map((article) => {
     article.urlToImage =
@@ -65,13 +94,15 @@ app.get('/search', cacheMiddleware(60), async (req, res) => {
     ).toLocaleString();
 
     // Storing hidden search time
-    article['searchTime'] = new Date();
+    article['searchTime'] = searchTime;
     return article;
   });
+  res.append('Last-Modified', cacheTime.toUTCString());
   res.render('result', { articles });
 });
 
 app.get('/', (req, res) => {
+  console.log(res.render);
   res.render('landing');
 });
 
