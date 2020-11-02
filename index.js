@@ -34,7 +34,26 @@ let cacheMiddleware = (duration) => {
     next();
   };
 };
-
+/* let tempStore = {};
+let cacheMiddleware = () => {
+  return (req, res, next) => {
+    let key = '__express__' + req.originalUrl || req.url;
+    if (tempStore.hasOwnProperty(key)) {
+      console.log('send cache');
+      res.send(tempStore[`${key}`]);
+      return;
+    } else {
+      res.sendResponse = res.send;
+      res.send = (body) => {
+        tempStore[`${key}`] = body;
+        console.log('SAVED to cache');
+        res.sendResponse(body);
+      };
+    }
+    next();
+  };
+};
+ */
 const app = express();
 app.engine('hbs', hbs({ defaultLayout: 'default.hbs' }));
 app.set('view engine', 'hbs');
@@ -87,7 +106,6 @@ app.get('/search', cacheMiddleware(60), async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log(res.render);
   res.render('landing');
 });
 
