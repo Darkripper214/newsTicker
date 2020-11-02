@@ -13,7 +13,7 @@ const API_KEY = process.env.API_KEY;
 const pageSize = 9;
 const END_POINT = 'https://newsapi.org/v2/top-headlines';
 
-let cacheMiddleware = (duration) => {
+/* let cacheMiddleware = (duration) => {
   return (req, res, next) => {
     let key = '__express__' + req.originalUrl || req.url;
     let cacheContent = memCache.get(key);
@@ -33,9 +33,15 @@ let cacheMiddleware = (duration) => {
     }
     next();
   };
+}; */
+
+// Manual implementation of memory cache
+let tempStore = {};
+let clearCache = function () {
+  tempStore = {};
 };
-/* let tempStore = {};
-let cacheMiddleware = () => {
+
+let cacheMiddleware = (duration) => {
   return (req, res, next) => {
     let key = '__express__' + req.originalUrl || req.url;
     if (tempStore.hasOwnProperty(key)) {
@@ -44,6 +50,7 @@ let cacheMiddleware = () => {
       return;
     } else {
       res.sendResponse = res.send;
+      setTimeout(clearCache, duration * 1000);
       res.send = (body) => {
         tempStore[`${key}`] = body;
         console.log('SAVED to cache');
@@ -53,7 +60,7 @@ let cacheMiddleware = () => {
     next();
   };
 };
- */
+
 const app = express();
 app.engine('hbs', hbs({ defaultLayout: 'default.hbs' }));
 app.set('view engine', 'hbs');
@@ -62,7 +69,7 @@ app.set('etag', false);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('static'));
 
-app.get('/search', cacheMiddleware(60), async (req, res) => {
+app.get('/search', cacheMiddleware(30), async (req, res) => {
   let endpoint = withQuery(END_POINT, {
     q: req.query.search,
     /* apiKey: API_KEY, */
