@@ -24,29 +24,14 @@ let cacheMiddleware = (duration) => {
       res.send(cacheContent);
       return;
     } else {
-      /*       res.sendResponse = res.send;
+      res.sendResponse = res.send;
       res.send = (body) => {
         console.log('DID NOT SENT CACHE!!!!');
         memCache.put(key, body, duration * 1000);
         res.sendResponse(body);
-      }; */
-
-      res.sendResponse = res.send;
-      addFunction = (func) => {
-        return function (body) {
-          console.log('DID NOT SENT CACHE!!!!');
-          memCache.put(key, body, duration * 1000);
-          console.log('CACHE SAVED');
-          // This Works!
-          // res.sendResponse(body);
-          // This does not work!
-          func(body);
-        };
       };
-      res.send = addFunction(res.sendResponse);
-      console.log('2_DID NOT SENT CACHE!!!!');
-      next();
     }
+    next();
   };
 };
 
@@ -108,8 +93,6 @@ app.get('/', (req, res) => {
 
 app.listen(port, () =>
   console.log(
-    `Running on http://localhost:${port} on ${new Date()} \n with API_KEY=${
-      process.env.API_KEY
-    }`
+    `Running on http://localhost:${port} on ${new Date()} \n with API_KEY=${API_KEY}`
   )
 );
